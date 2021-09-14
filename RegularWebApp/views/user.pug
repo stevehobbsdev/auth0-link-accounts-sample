@@ -9,6 +9,7 @@ mixin suggestedUserMixin(user)
         img.profile-image(src=user.picture)
     td=JSON.stringify(user.user_metadata, null, 2)
     td=JSON.stringify(user.app_metadata, null, 2) 
+    td=user.clients.map(client => client.name).join(', ')
     td
       form(action="/link" method="post")
         input(type="hidden" name="userid" value=user.user_id)
@@ -63,6 +64,7 @@ block content
               th picture
               th user_metadata
               th app_metadata
+              th clients
               th actions
           tbody#suggested-users
             each user in suggestedUsers

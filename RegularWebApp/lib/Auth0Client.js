@@ -61,6 +61,7 @@ class Auth0Client {
 
   async getUsersWithSameVerifiedEmail({ sub, email }) {
     debug("searching maching users with email *%s* ...", email);
+
     return await this.request({
       url: `${process.env.ISSUER_BASE_URL}/api/v2/users`,
       qs: {
@@ -77,6 +78,28 @@ class Auth0Client {
       method: "POST",
       json: {
         link_with: targetUserIdToken,
+      },
+    });
+  }
+
+  async getConnections(options = {}) {
+    debug("getting all connections...");
+
+    return await this.request({
+      url: `${process.env.ISSUER_BASE_URL}/api/v2/connections`,
+      method: "GET",
+      qs: options,
+    });
+  }
+
+  async getClient(clientId, fields) {
+    debug(`getting client for ${clientId}...`);
+
+    return await this.request({
+      url: `${process.env.ISSUER_BASE_URL}/api/v2/clients/${clientId}`,
+      method: "GET",
+      qs: {
+        fields,
       },
     });
   }
