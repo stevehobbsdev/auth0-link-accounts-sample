@@ -3,16 +3,25 @@ extends user-layout
 mixin suggestedUserMixin(user)
   tr(data-id=user.user_id)
     td=user.user_id
-    td=user.name
     td 
       if (user.picture)
         img.profile-image(src=user.picture)
-    td=JSON.stringify(user.user_metadata, null, 2)
-    td=JSON.stringify(user.app_metadata, null, 2) 
+      =user.name
     td
       ul
         each client in user.clients
           li=client.name
+    td
+      ul
+        each ru in user.roleUsers
+          li=`${ru.role.name} (users: ${ru.users.length})`
+    td
+      ul
+        each org in user.organizations
+          li
+            if (org.branding && org.branding.logo_url)
+              img.profile-image(src=org.branding.logo_url)
+            =org.display_name
     td
       form(action="/link" method="post")
         input(type="hidden" name="userid" value=user.user_id)
@@ -47,11 +56,10 @@ block content
             tr
               th user_id
               th name
-              th picture
-              th user_metadata
-              th app_metadata
               th applications
-              th actions
+              th roles
+              th organizations
+              th actions 
           tbody#suggested-users
             each user in suggestedUsers
               +suggestedUserMixin(user)

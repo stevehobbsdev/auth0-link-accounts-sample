@@ -104,6 +104,51 @@ class Auth0Client {
     });
   }
 
+  async getUserRoles({ user_id: userId }) {
+    debug(`getting user roles for ${userId}...`);
+    const roles = await this.request({
+      url: `${process.env.ISSUER_BASE_URL}/api/v2/users/${userId}/roles`,
+      method: "GET",
+    });
+
+    const roleUsers = await Promise.all(
+      roles.reduce((acc, role) => {
+        const promise = this.request({
+          url: `${process.env.ISSUER_BASE_URL}/api/v2/roles/${role.id}/users`,
+          method: "GET",
+        }).then((users) => ({ role, users }));
+        acc.push(promise);
+        return acc;
+      }, [])
+    );
+
+    return roleUsers;
+  }
+
+  async getUserOrganizations({ user_id: userId }) {
+    debug(`getting user organizations for ${userId}...`);
+
+    const orgs = await this.request({
+      url: `${process.env.ISSUER_BASE_URL}/api/v2/organizations`,
+      method: "GET",
+    });
+
+    const orgMembers = await Promise.all(
+      orgs.reduce((acc, org) => {
+        const promise = this.request({
+          url: `${process.env.ISSUER_BASE_URL}/api/v2/organizations/${org.id}/members`,
+          method: "GET",
+        }).then((members) => ({ org, members }));
+        acc.push(promise);
+        return acc;
+      }, [])
+    );
+
+    return orgMembers
+      .filter((om) => om.members.some((m) => m.user_id === userId))
+      .map((om) => om.org);
+  }
+
   /*
    * Unlinks Accounts
    * Unlinks targetUserId account from rootUserId account

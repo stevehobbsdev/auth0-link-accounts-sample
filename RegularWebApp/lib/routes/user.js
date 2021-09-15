@@ -59,6 +59,9 @@ router.get("/", async (req, res) => {
         }, Promise.resolve());
 
         user.clients = clients;
+
+        user.roleUsers = await auth0Client.getUserRoles(user);
+        user.organizations = await auth0Client.getUserOrganizations(user);
       })
     );
 
@@ -70,9 +73,9 @@ router.get("/", async (req, res) => {
       wrongAccountError: flashError && flashError === Errors.WrongAccount,
       connection,
     });
-  } catch (err) {
-    debug("GET /user[s] failed: %o", err);
-    res.render("error", err);
+  } catch ({ message, ...error }) {
+    debug("GET /user[s] failed: %o", error);
+    res.render("error", { message, error });
   }
 });
 
