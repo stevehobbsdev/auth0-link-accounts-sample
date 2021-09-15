@@ -33,6 +33,8 @@ class Auth0Client {
       Authorization: `Bearer ${token}`,
     };
 
+    console.log(options.method || 'GET', options.url);
+
     const opts = { ...options, headers };
     const body = await rp(opts);
     try {
