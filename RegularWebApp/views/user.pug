@@ -9,7 +9,10 @@ mixin suggestedUserMixin(user)
         img.profile-image(src=user.picture)
     td=JSON.stringify(user.user_metadata, null, 2)
     td=JSON.stringify(user.app_metadata, null, 2) 
-    td=user.clients.map(client => client.name).join(', ')
+    td
+      ul
+        each client in user.clients
+          li=client.name
     td
       form(action="/link" method="post")
         input(type="hidden" name="userid" value=user.user_id)
@@ -34,23 +37,6 @@ mixin identityMixin(identity)
         button.btn.btn-danger.btn-xs.unlink(type='submit') unlink 
 
 block content
-
-  .panel.panel-default
-    .panel-heading 
-      img.img-circle.profile-image(src=`${user.picture}`) 
-      |Root Profile 
-    .panel-body
-      dl.dl-horizontal
-        dt email
-        dd #{user.email} &nbsp;
-          if (user.email_verified)
-            span.label.label-success verified
-          else
-            span.label.label-danger not verified
-        dt raw profile
-        dd
-          pre.profile=JSON.stringify(user,null,2)
-
   if (suggestedUsers.length > 0 )
     .panel.panel-default
       .panel-heading Accounts with the same email address
@@ -64,7 +50,7 @@ block content
               th picture
               th user_metadata
               th app_metadata
-              th clients
+              th applications
               th actions
           tbody#suggested-users
             each user in suggestedUsers

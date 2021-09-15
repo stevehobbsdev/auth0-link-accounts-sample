@@ -1,7 +1,6 @@
 "use strict";
 
 const debug = require("debug")("auth0-link-accounts-sample");
-
 const router = require("express").Router();
 const auth0Client = require("../Auth0Client");
 const { Errors, clear } = require("../flashErrors");
@@ -52,6 +51,8 @@ router.get("/", async (req, res) => {
               clientId,
               "name"
             );
+          } else {
+            debug(`using memoized client for ${clientId}`);
           }
 
           clients.push(clientMemo[clientId]);
